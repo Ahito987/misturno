@@ -118,6 +118,17 @@
     box-sizing: border-box;
     margin-bottom: 10px;
   }
+      
+   .turno-abreviado {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 1.2em;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #2f4e37;
+  word-wrap: break-word;
+  text-align: center;
+}
 
     footer {
       text-align: center;
@@ -126,6 +137,7 @@
       padding: 10px;
     }
   </style>
+  
 </head>
 <body>
   <header>
@@ -225,9 +237,26 @@
     }
 
     function renderizarTurno(fecha) {
-      const turno = turnos[fecha];
-      return turno ? `${turno.hora || ""} - ${turno.tipo || ""}` : "";
-    }
+  const turno = turnos[fecha];
+  if (!turno) return "(Sin turno)";
+  
+  const abreviaturas = {
+    "Mañana": "M",
+    "Tarde": "T",
+    "Noche": "N",
+    "Vacaciones": "V",
+    "Libranza": "L",
+    "Débito Horario": "BH",
+    "Asunto Propio": "AP",
+    "Dia Conciliación": "DC",
+    "Permiso Especial": "PE",
+    "permiso Exámen": "PX"
+  };
+
+  const tipo = abreviaturas[turno.tipo] || turno.tipo.charAt(0).toUpperCase();
+  return `<span class="turno-abreviado"><strong>${tipo}</strong></span>`;
+}
+
 
     function abrirModal(fecha) {
       editFecha.value = fecha;
