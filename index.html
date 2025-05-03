@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TurnosApp</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #171817;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      background-color: #567964;
+      color: white;
+      padding: 10px;
+    }
+
+    .logo {
+      width: 38px;
+      height: 46px;
+      margin-right: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      padding: 15px;
+      background-color: #d8e9dc;
+      align-items: center;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+    .controls button {
+      background-color: #2f4e37;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    #diasSemana {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      background-color: #f38f0d;
+      text-align: center;
+      font-weight: bold;
+      padding: 10px 0;
+    }
+
+    #calendario {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1px;
+      background-color:#567964;
+      padding: 10px;
+      min-height: 80vh;
+    }
+
+    .dia {
+      background-color: white;
+      padding: 10px;
+      min-height: 100px;
+      cursor: pointer;
+    }
+
+    .modal {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal.hidden {
+      display: none;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 5px;
+      width: 300px;
+    }
+
+    .cerrar {
+      float: right;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    footer {
+      text-align: center;
+      background: #2f4e37;
+      color: white;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="assets/icono-app38x46.png" alt="logo" class="logo"/>
+    <h1>TurnosApp</h1>
+  </header>
+
+  <div class="controls">
+    <button id="prevMes">« Anterior</button>
+    <span id="mesActual"></span>
+    <button id="nextMes">Siguiente »</button>
+  </div>
+
+  <div id="diasSemana">
+    <div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div><div>Dom</div>
+  </div>
+
+  <div id="calendario"></div>
+
+  <div id="modalTurno" class="modal hidden">
+    <div class="modal-content">
+      <span id="cerrarModal" class="cerrar">&times;</span>
+      <h2>Apunta tu Turno</h2>
+      <form id="formEditarTurno">
+        <label for="editFecha">Fecha:</label>
+        <input type="date" id="editFecha" readonly />
+
+        <label for="editHora">Hora:</label>
+        <input type="time" id="editHora" required />
+
+        <label for="editTipo">Tipo de Turno:</label>
+        <select id="editTipo" required>
+          <option value="Mañana">Mañana</option>
+          <option value="Tarde">Tarde</option>
+          <option value="Noche">Noche</option>
+          <option value="Vacaciones">Vacaciones</option>
+          <option value="Libranza">Libranza</option>
+          <option value="Débito Horario">Débito Horario</option>
+          <option value="Asunto Propio">Asunto Propio</option>
+          <option value="Dia Conciliación">Día Conciliación</option>
+          <option value="Permiso Especial">Permiso Especial</option>
+          <option value="Permiso Exámen">Permiso Exámen</option>
+        </select>
+
+        <label for="editNota">Notas:</label>
+        <textarea id="editNota" rows="2"></textarea>
+
+        <button type="submit">💾 Guardar Cambios</button>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    &copy; Made with
+    <img width="26" height="26" src="https://img.icons8.com/metro/26/FA5252/hearts.png" alt="hearts"/> for TurnosApp 2025.
+  </footer>
+
+  <script>
+    const calendario = document.getElementById("calendario");
+    const modal = document.getElementById("modalTurno");
+    const cerrarModal = document.getElementById("cerrarModal");
+    const formEditar = document.getElementById("formEditarTurno");
+    const editFecha = document.getElementById("editFecha");
+    const editHora = document.getElementById("editHora");
+    const editTipo = document.getElementById("editTipo");
+    const editNota = document.getElementById("editNota");
+    const mesActualTexto = document.getElementById("mesActual");
+    const btnPrev = document.getElementById("prevMes");
+    const btnNext = document.getElementById("nextMes");
+
+    let turnos = JSON.parse(localStorage.getItem("turnos")) || {};
+    let fechaActual = new Date();
+
+    function renderizarCalendario() {
+      calendario.innerHTML = "";
+      const año = fechaActual.getFullYear();
+      const mes = fechaActual.getMonth();
+      const primerDia = new Date(año, mes, 1);
+      const ultimoDia = new Date(año, mes + 1, 0);
+      const primerLunes = primerDia.getDay() === 0 ? 6 : primerDia.getDay() - 1;
+
+      mesActualTexto.textContent = primerDia.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+
+      for (let i = 0; i < primerLunes; i++) {
+        calendario.innerHTML += '<div></div>';
+      }
+
+      for (let dia = 1; dia <= ultimoDia.getDate(); dia++) {
+        const fecha = `${año}-${(mes + 1).toString().padStart(2, "0")}-${dia.toString().padStart(2, "0")}`;
+        const div = document.createElement("div");
+        div.classList.add("dia");
+        div.dataset.fecha = fecha;
+        div.innerHTML = `<strong>${dia}</strong><br>${renderizarTurno(fecha)}`;
+        div.onclick = () => abrirModal(fecha);
+        calendario.appendChild(div);
+      }
+    }
+
+    function renderizarTurno(fecha) {
+      const turno = turnos[fecha];
+      return turno ? `${turno.hora || ""} - ${turno.tipo || ""}` : "";
+    }
+
+    function abrirModal(fecha) {
+      editFecha.value = fecha;
+      const turno = turnos[fecha] || {};
+      editHora.value = turno.hora || "";
+      editTipo.value = turno.tipo || "Mañana";
+      editNota.value = turno.nota || "";
+      modal.classList.remove("hidden");
+    }
+
+    cerrarModal.onclick = () => modal.classList.add("hidden");
+
+    formEditar.onsubmit = function (e) {
+      e.preventDefault();
+      const fecha = editFecha.value;
+      turnos[fecha] = {
+        hora: editHora.value,
+        tipo: editTipo.value,
+        nota: editNota.value,
+      };
+      localStorage.setItem("turnos", JSON.stringify(turnos));
+      modal.classList.add("hidden");
+      renderizarCalendario();
+    };
+
+    btnPrev.onclick = () => {
+      fechaActual.setMonth(fechaActual.getMonth() - 1);
+      renderizarCalendario();
+    };
+
+    btnNext.onclick = () => {
+      fechaActual.setMonth(fechaActual.getMonth() + 1);
+      renderizarCalendario();
+    };
+
+    // Swipe para móvil
+    let startX = 0;
+    calendario.addEventListener("touchstart", e => startX = e.touches[0].clientX);
+    calendario.addEventListener("touchend", e => {
+      const endX = e.changedTouches[0].clientX;
+      if (startX - endX > 50) btnNext.click();
+      if (endX - startX > 50) btnPrev.click();
+    });
+
+    renderizarCalendario();
+  </script>
+</body>
+</html>
