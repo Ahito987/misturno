@@ -4,7 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TurnosApp</title>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#2f4e37" />
+<link rel="icon" href="assets/icono-app38x46.png" type="image/png">
   <style>
+* {
+      box-sizing: border-box;
+}
     body {
       font-family: Arial, sans-serif;
       background-color: #171817;
@@ -13,9 +19,8 @@
       overflow-x: hidden;
     }
 
-    header {
-      display: flex;
-      align-items: center;
+    header, footer {
+      text-align: center;
       background-color: #567964;
       color: white;
       padding: 10px;
@@ -23,15 +28,32 @@
 
     .logo {
       width: 38px;
-      height: 46px;
-      margin-right: 10px;
+      vertical-align: middle;
     }
-
-    h1 {
-      margin: 0;
-      font-size: 1.5rem;
+    nav {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 200px;
+      height: 100%;
+      background-color: #3d5a40;
+      transition: left 0.3s ease;
+      padding-top: 60px;
+      z-index: 10;
     }
-
+    nav a {
+      display: block;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+    }
+    nav a:hover {
+      background-color: #5a7b5f;
+    }
+    nav.open {
+      left: 0;
+    }
+    
     .controls {
       display: flex;
       justify-content: space-between;
@@ -57,7 +79,7 @@
       background-color: #f38f0d;
       text-align: center;
       font-weight: bold;
-      padding: 10px 0;
+      padding: 5px 0;
     }
 
     #calendario {
@@ -66,14 +88,17 @@
       gap: 1px;
       background-color:#567964;
       padding: 10px;
-      min-height: 80vh;
+      min-height: 100vh;
     }
 
     .dia {
       background-color: white;
-      padding: 10px;
-      min-height: 100px;
+      padding: 4px;
+      min-height: 80px;
       cursor: pointer;
+      font-size: 1.1em;
+      font-weight: bold;
+      text-align: center;
     }
 
     .modal {
@@ -96,10 +121,7 @@
       background: white;
       padding: 20px;
       border-radius: 5px;
-      width: 90%;
-      max-width: 400px;
-      box-sizing: border-box;
-      overflow-y: auto
+      width: 300px;
     }
 
     .cerrar {
@@ -107,49 +129,33 @@
       cursor: pointer;
       font-size: 20px;
     }
-    @media (max-width: 480px) {
-  .modal-content {
-    width: 95%;
-    max-height: 90vh;
-  }
 
-  input, select, textarea {
-    width: 100%;
-    box-sizing: border-box;
-    margin-bottom: 10px;
-  }
-      
-   .turno-abreviado {
-  display: inline-block;
-  margin-top: 8px;
-  font-size: 1.2em;
-  font-weight: bold;
-  text-transform: uppercase;
-  color: #2f4e37;
-  word-wrap: break-word;
-  text-align: center;
-}
-
-    footer {
-      text-align: center;
-      background: #2f4e37;
-      color: white;
-      padding: 10px;
+    footer img {
+     verticalalign: middle; 
     }
+
   </style>
-  
 </head>
 <body>
   <header>
+    <span class="menu-toggle" onclick="toggleMenu()">&#9776;</span>
     <img src="assets/icono-app38x46.png" alt="logo" class="logo"/>
-    <h1>TurnosApp</h1>
+    <h1 style="display:inline">TurnosApp</h1>
   </header>
+
+
+<nav id="sideMenu">
+    <a href="#">Turnos Generados</a>
+    <a href="#">Añadir Festivos</a>
+  </nav>
+
 
   <div class="controls">
     <button id="prevMes">« Anterior</button>
     <span id="mesActual"></span>
     <button id="nextMes">Siguiente »</button>
   </div>
+
 
   <div id="diasSemana">
     <div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div><div>Vie</div><div>Sáb</div><div>Dom</div>
@@ -164,27 +170,23 @@
       <form id="formEditarTurno">
         <label for="editFecha">Fecha:</label>
         <input type="date" id="editFecha" readonly />
-
         <label for="editHora">Hora:</label>
         <input type="time" id="editHora" required />
-
         <label for="editTipo">Tipo de Turno:</label>
         <select id="editTipo" required>
-          <option value="Mañana">Mañana</option>
-          <option value="Tarde">Tarde</option>
-          <option value="Noche">Noche</option>
-          <option value="Vacaciones">Vacaciones</option>
-          <option value="Libranza">Libranza</option>
-          <option value="Débito Horario">Débito Horario</option>
-          <option value="Asunto Propio">Asunto Propio</option>
-          <option value="Dia Conciliación">Día Conciliación</option>
-          <option value="Permiso Especial">Permiso Especial</option>
-          <option value="Permiso Exámen">Permiso Exámen</option>
+          <option value="M">Mañana</option>
+          <option value="T">Tarde</option>
+          <option value="N">Noche</option>
+          <option value="V">Vacaciones</option>
+          <option value="L">Libranza</option>
+          <option value="BH">Débito Horario</option>
+          <option value="AP">Asunto Propio</option>
+          <option value="DC">Día Conciliación</option>
+          <option value="PE">Permiso Especial</option>
+          <option value="EX">Permiso Exámen</option>
         </select>
-
         <label for="editNota">Notas:</label>
         <textarea id="editNota" rows="2"></textarea>
-
         <button type="submit">💾 Guardar Cambios</button>
       </form>
     </div>
@@ -192,7 +194,7 @@
 
   <footer>
     &copy; Made with
-    <img width="26" height="26" src="https://img.icons8.com/metro/26/FA5252/hearts.png" alt="hearts"/> for TurnosApp 2025.
+    <img width="20" height="20" src="https://img.icons8.com/metro/26/FA5252/hearts.png" alt="hearts"/> for TurnosApp 2025.
   </footer>
 
   <script>
@@ -207,26 +209,33 @@
     const mesActualTexto = document.getElementById("mesActual");
     const btnPrev = document.getElementById("prevMes");
     const btnNext = document.getElementById("nextMes");
+   const menu = document.getElementById("sideMenu");
 
     let turnos = JSON.parse(localStorage.getItem("turnos")) || {};
+      function toggleMenu() {
+      menu.classList.toggle("open");
+    }
+
     let fechaActual = new Date();
 
-    function renderizarCalendario() {
+   function renderizarCalendario() {
       calendario.innerHTML = "";
-      const año = fechaActual.getFullYear();
-      const mes = fechaActual.getMonth();
-      const primerDia = new Date(año, mes, 1);
-      const ultimoDia = new Date(año, mes + 1, 0);
-      const primerLunes = primerDia.getDay() === 0 ? 6 : primerDia.getDay() - 1;
+      const hoy = new Date();
+      const anio = hoy.getFullYear();
+      const mes = hoy.getMonth();
+      const primerDia = new Date(anio, mes, 1);
+      const ultimoDia = new Date(anio, mes + 1, 0);
+      const offset = (primerDia.getDay() + 6) % 7; // Lunes como 1er día
 
-      mesActualTexto.textContent = primerDia.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
-
-      for (let i = 0; i < primerLunes; i++) {
-        calendario.innerHTML += '<div></div>';
+      for (let i = 0; i < offset; i++) {
+        const vacio = document.createElement("div");
+        vacio.classList.add("dia");
+        vacio.style.background = "#f4f4f4";
+        calendario.appendChild(vacio);
       }
 
       for (let dia = 1; dia <= ultimoDia.getDate(); dia++) {
-        const fecha = `${año}-${(mes + 1).toString().padStart(2, "0")}-${dia.toString().padStart(2, "0")}`;
+        const fecha = new Date(anio, mes, dia).toISOString().split("T")[0];
         const div = document.createElement("div");
         div.classList.add("dia");
         div.dataset.fecha = fecha;
@@ -237,26 +246,9 @@
     }
 
     function renderizarTurno(fecha) {
-  const turno = turnos[fecha];
-  if (!turno) return "(Sin turno)";
-  
-  const abreviaturas = {
-    "Mañana": "M",
-    "Tarde": "T",
-    "Noche": "N",
-    "Vacaciones": "V",
-    "Libranza": "L",
-    "Débito Horario": "BH",
-    "Asunto Propio": "AP",
-    "Dia Conciliación": "DC",
-    "Permiso Especial": "PE",
-    "permiso Exámen": "PX"
-  };
-
-  const tipo = abreviaturas[turno.tipo] || turno.tipo.charAt(0).toUpperCase();
-  return `<span class="turno-abreviado"><strong>${tipo}</strong></span>`;
-}
-
+      const turno = turnos[fecha];
+      return turno ? `${turno.hora || ""} - ${turno.tipo || ""}` : "";
+    }
 
     function abrirModal(fecha) {
       editFecha.value = fecha;
@@ -303,5 +295,16 @@
 
     renderizarCalendario();
   </script>
+
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/misturno/service-worker.js")
+        .then(reg => console.log("Service Worker registrado", reg))
+        .catch(err => console.error("Error al registrar Service Worker", err));
+    });
+  }
+</script>
+
 </body>
 </html>
