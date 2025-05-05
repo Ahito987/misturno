@@ -197,120 +197,106 @@
     <img width="20" height="20" src="https://img.icons8.com/metro/26/FA5252/hearts.png" alt="hearts"/> for TurnosApp 2025.
   </footer>
 
-  <script>
-   const calendario = document.getElementById("calendario");
-    const modal = document.getElementById("modalTurno");
-    const cerrarModal = document.getElementById("cerrarModal");
-    const formEditar = document.getElementById("formEditarTurno");
-    const editFecha = document.getElementById("editFecha");
-    const editHora = document.getElementById("editHora");
-    const editTipo = document.getElementById("editTipo");
-    const editNota = document.getElementById("editNota");
-    const menu = document.getElementById("sideMenu");
-    const tituloMes = document.getElementById("tituloMes");
-
-    let turnos = JSON.parse(localStorage.getItem("turnos")) || {};
-    let fechaActual = new Date();
-
-    function toggleMenu() {
-      menu.classList.toggle("open");
-    }
-
-    function cambiarMes(direccion) {
-      fechaActual.setMonth(fechaActual.getMonth() + direccion);
-      renderizarCalendario();
-    }
-
-    function renderizarCalendario() {
-      calendario.innerHTML = "";
-      const anio = fechaActual.getFullYear();
-      const mes = fechaActual.getMonth();
-      const primerDia = new Date(anio, mes, 1);
-      const ultimoDia = new Date(anio, mes + 1, 0);
-      const offset = (primerDia.getDay() + 6) % 7; // lunes=0
-
-      const nombreMeses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
-      tituloMes.textContent = `${nombreMeses[mes]} ${anio}`;
-
-      for (let i = 0; i < offset; i++) {
-        const vacio = document.createElement("div");
-        vacio.classList.add("dia");
-        vacio.style.background = "#f4f4f4";
-        calendario.appendChild(vacio);
-      }
-
-      for (let dia = 1; dia <= ultimoDia.getDate(); dia++) {
-  const fechaLocal = `${anio}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
-  const div = document.createElement("div");
-  div.classList.add("dia");
-  div.dataset.fecha = fechaLocal;
-  div.innerHTML = `<strong>${dia}</strong><br>${renderizarTurno(fechaLocal)}`;
-  div.onclick = () => abrirModal(fechaLocal);
-  calendario.appendChild(div);
-}
-
-
-        const div = document.createElement("div");
-        div.classList.add("dia");
-        div.dataset.fecha = fechaLocal;
-        div.innerHTML = `<strong>${dia}</strong><br>${renderizarTurno(fechaLocal)}`;
-        div.onclick = () => abrirModal(fechaLocal);
-        calendario.appendChild(div);
-      }
-    }
-
-    function renderizarTurno(fecha) {
-      const turno = turnos[fecha];
-      return turno ? `${turno.tipo || ""}` : "";
-    }
-
-    function abrirModal(fecha) {
-      editFecha.value = fecha;
-      const turno = turnos[fecha] || {};
-      editHora.value = turno.hora || "";
-      editTipo.value = turno.tipo || "M";
-      editNota.value = turno.nota || "";
-      modal.classList.remove("hidden");
-    }
-
-    cerrarModal.onclick = () => modal.classList.add("hidden");
-
-    formEditar.onsubmit = function (e) {
-      e.preventDefault();
-      const fecha = editFecha.value;
-      turnos[fecha] = {
-        hora: editHora.value,
-        tipo: editTipo.value,
-        nota: editNota.value,
-      };
-      localStorage.setItem("turnos", JSON.stringify(turnos));
-      modal.classList.add("hidden");
-      renderizarCalendario();
-    };
-
   
+  <script>
+  const calendario = document.getElementById("calendario");
+  const modal = document.getElementById("modalTurno");
+  const cerrarModal = document.getElementById("cerrarModal");
+  const formEditar = document.getElementById("formEditarTurno");
+  const editFecha = document.getElementById("editFecha");
+  const editHora = document.getElementById("editHora");
+  const editTipo = document.getElementById("editTipo");
+  const editNota = document.getElementById("editNota");
+  const menu = document.getElementById("sideMenu");
+  const tituloMes = document.getElementById("mesActual");
+  const btnPrev = document.getElementById("prevMes");
+  const btnNext = document.getElementById("nextMes");
 
-    btnPrev.onclick = () => {
-      fechaActual.setMonth(fechaActual.getMonth() - 1);
-      renderizarCalendario();
-    };
+  let turnos = JSON.parse(localStorage.getItem("turnos")) || {};
+  let fechaActual = new Date();
 
-    btnNext.onclick = () => {
-      fechaActual.setMonth(fechaActual.getMonth() + 1);
-      renderizarCalendario();
-    };
+  function toggleMenu() {
+    menu.classList.toggle("open");
+  }
 
-    // Swipe para móvil
-    let startX = 0;
-    calendario.addEventListener("touchstart", e => startX = e.touches[0].clientX);
-    calendario.addEventListener("touchend", e => {
-      const endX = e.changedTouches[0].clientX;
-      if (startX - endX > 50) btnNext.click();
-      if (endX - startX > 50) btnPrev.click();
-    });
-
+  function cambiarMes(direccion) {
+    fechaActual.setMonth(fechaActual.getMonth() + direccion);
     renderizarCalendario();
-  </script>
+  }
+
+  function renderizarCalendario() {
+    calendario.innerHTML = "";
+    const anio = fechaActual.getFullYear();
+    const mes = fechaActual.getMonth();
+    const primerDia = new Date(anio, mes, 1);
+    const ultimoDia = new Date(anio, mes + 1, 0);
+    const offset = (primerDia.getDay() + 6) % 7; // lunes=0
+
+    const nombreMeses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+    tituloMes.textContent = `${nombreMeses[mes]} ${anio}`;
+
+    for (let i = 0; i < offset; i++) {
+      const vacio = document.createElement("div");
+      vacio.classList.add("dia");
+      vacio.style.background = "#f4f4f4";
+      calendario.appendChild(vacio);
+    }
+
+    for (let dia = 1; dia <= ultimoDia.getDate(); dia++) {
+      const fechaLocal = `${anio}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+      const div = document.createElement("div");
+      div.classList.add("dia");
+      div.dataset.fecha = fechaLocal;
+      div.innerHTML = `<strong>${dia}</strong><br>${renderizarTurno(fechaLocal)}`;
+      div.onclick = () => abrirModal(fechaLocal);
+      calendario.appendChild(div);
+    }
+  }
+
+  function renderizarTurno(fecha) {
+    const turno = turnos[fecha];
+    return turno ? `${turno.tipo || ""}` : "";
+  }
+
+  function abrirModal(fecha) {
+    editFecha.value = fecha;
+    const turno = turnos[fecha] || {};
+    editHora.value = turno.hora || "";
+    editTipo.value = turno.tipo || "M";
+    editNota.value = turno.nota || "";
+    modal.classList.remove("hidden");
+  }
+
+  cerrarModal.onclick = () => modal.classList.add("hidden");
+
+  formEditar.onsubmit = function (e) {
+    e.preventDefault();
+    const fecha = editFecha.value;
+    turnos[fecha] = {
+      hora: editHora.value,
+      tipo: editTipo.value,
+      nota: editNota.value,
+    };
+    localStorage.setItem("turnos", JSON.stringify(turnos));
+    modal.classList.add("hidden");
+    renderizarCalendario();
+  };
+
+  btnPrev.onclick = () => cambiarMes(-1);
+  btnNext.onclick = () => cambiarMes(1);
+
+  // Swipe para móvil
+  let startX = 0;
+  calendario.addEventListener("touchstart", e => startX = e.touches[0].clientX);
+  calendario.addEventListener("touchend", e => {
+    const endX = e.changedTouches[0].clientX;
+    if (startX - endX > 50) cambiarMes(1);
+    if (endX - startX > 50) cambiarMes(-1);
+  });
+
+  renderizarCalendario();
+</script>
+
 
 <script>
   if ("serviceWorker" in navigator) {
