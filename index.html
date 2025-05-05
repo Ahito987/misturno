@@ -198,7 +198,7 @@
   </footer>
 
   <script>
-    const calendario = document.getElementById("calendario");
+   const calendario = document.getElementById("calendario");
     const modal = document.getElementById("modalTurno");
     const cerrarModal = document.getElementById("cerrarModal");
     const formEditar = document.getElementById("formEditarTurno");
@@ -282,30 +282,7 @@
       renderizarCalendario();
     };
 
-    renderizarCalendario();
-    function abrirModal(fecha) {
-      editFecha.value = fecha;
-      const turno = turnos[fecha] || {};
-      editHora.value = turno.hora || "";
-      editTipo.value = turno.tipo || "Mañana";
-      editNota.value = turno.nota || "";
-      modal.classList.remove("hidden");
-    }
-
-    cerrarModal.onclick = () => modal.classList.add("hidden");
-
-    formEditar.onsubmit = function (e) {
-      e.preventDefault();
-      const fecha = editFecha.value;
-      turnos[fecha] = {
-        hora: editHora.value,
-        tipo: editTipo.value,
-        nota: editNota.value,
-      };
-      localStorage.setItem("turnos", JSON.stringify(turnos));
-      modal.classList.add("hidden");
-      renderizarCalendario();
-    };
+  
 
     btnPrev.onclick = () => {
       fechaActual.setMonth(fechaActual.getMonth() - 1);
