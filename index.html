@@ -240,8 +240,15 @@
       }
 
       for (let dia = 1; dia <= ultimoDia.getDate(); dia++) {
-        const fecha = new Date(anio, mes, dia);
-        const fechaLocal = `${anio}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+  const fechaLocal = `${anio}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+  const div = document.createElement("div");
+  div.classList.add("dia");
+  div.dataset.fecha = fechaLocal;
+  div.innerHTML = `<strong>${dia}</strong><br>${renderizarTurno(fechaLocal)}`;
+  div.onclick = () => abrirModal(fechaLocal);
+  calendario.appendChild(div);
+}
+
 
         const div = document.createElement("div");
         div.classList.add("dia");
