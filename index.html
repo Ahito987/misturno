@@ -197,44 +197,38 @@
     }
 
     function renderizarCalendario() {
-      calendario.innerHTML = "";
-      const anio = fechaActual.getFullYear();
-      const mes = fechaActual.getMonth();
-      const primerDia = new Date(anio, mes, 1);
-      const ultimoDia = new Date(anio, mes + 1, 0);
-      // Ajuste para que la semana comience en lunes
-      const offset = (primerDia.getDay() + 6) % 7;
+  calendario.innerHTML = "";
+  const anio = fechaActual.getFullYear();
+  const mes = fechaActual.getMonth();
+  const primerDia = new Date(anio, mes, 1);
+  const ultimoDia = new Date(anio, mes + 1, 0);
+  const offset = (primerDia.getDay() + 6) % 7; // lunes=0
 
-      const nombreMeses = [
-        "ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO",
-        "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"
-      ];
-      tituloMes.textContent = `${nombreMeses[mes]} ${anio}`;
+  const nombreMeses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+  document.getElementById("mesActual").textContent = `${nombreMeses[mes]} ${anio}`;
 
-      // Se insertan celdas vacías para el primer día de la semana
-      for (let i = 0; i < offset; i++) {
-        const vacio = document.createElement("div");
-        vacio.classList.add("dia");
-        vacio.style.background = "#f4f4f4";
-        calendario.appendChild(vacio);
-      }
+  for (let i = 0; i < offset; i++) {
+    const vacio = document.createElement("div");
+    vacio.classList.add("dia");
+    vacio.style.background = "#f4f4f4";
+    calendario.appendChild(vacio);
+  }
 
-      // Se crean los días del mes
-      for (let dia = 1; dia <= ultimoDia.getDate(); dia++) {
-        // Se construye el string en formato YYYY-MM-DD sin conversión a UTC
-        const fechaLocal = `${fecha.getFullYear()}-${(fecha.getMonth() + 1).toString().padStart(2, '0')}-${fecha.getDate().toString().padStart(2, '0')}`;
-        const div = document.createElement("div");
-        div.classList.add("dia");
-        div.dataset.fecha = fechaLocal;
-        div.innerHTML = `<strong>${dia}</strong><br>${renderizarTurno(fechaLocal)}`;
-        // Se agrega un log para verificar la fecha seleccionada
-        div.onclick = () => { 
-          console.log('Fecha seleccionada:', fechaLocal);
-          abrirModal(fechaLocal);
-        };
-        calendario.appendChild(div);
-      }
-    }
+  for (let dia = 1; dia <= ultimoDia.getDate(); dia++) {
+    const fecha = new Date(anio, mes, dia);
+
+    // ✅ Evitamos problemas con zonas horarias usando componentes por separado
+    const fechaLocal = `${fecha.getFullYear()}-${(fecha.getMonth() + 1).toString().padStart(2, '0')}-${fecha.getDate().toString().padStart(2, '0')}`;
+
+    const div = document.createElement("div");
+    div.classList.add("dia");
+    div.dataset.fecha = fechaLocal;
+    div.innerHTML = `<strong>${dia}</strong><br>${renderizarTurno(fechaLocal)}`;
+    div.onclick = () => abrirModal(fechaLocal);
+    calendario.appendChild(div);
+  }
+
+
 
     function renderizarTurno(fecha) {
       const turno = turnos[fecha];
