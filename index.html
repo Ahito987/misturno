@@ -206,20 +206,22 @@
     const editHora = document.getElementById("editHora");
     const editTipo = document.getElementById("editTipo");
     const editNota = document.getElementById("editNota");
-    const mesActualTexto = document.getElementById("mesActual");
-    const btnPrev = document.getElementById("prevMes");
-    const btnNext = document.getElementById("nextMes");
-   const menu = document.getElementById("sideMenu");
+    const menu = document.getElementById("sideMenu");
+    const tituloMes = document.getElementById("tituloMes");
 
     let turnos = JSON.parse(localStorage.getItem("turnos")) || {};
-      function toggleMenu() {
+    let fechaActual = new Date();
+
+    function toggleMenu() {
       menu.classList.toggle("open");
     }
 
-    let fechaActual = new Date();
+    function cambiarMes(direccion) {
+      fechaActual.setMonth(fechaActual.getMonth() + direccion);
+      renderizarCalendario();
+    }
 
-
-function renderizarCalendario() {
+    function renderizarCalendario() {
       calendario.innerHTML = "";
       const anio = fechaActual.getFullYear();
       const mes = fechaActual.getMonth();
@@ -235,24 +237,8 @@ function renderizarCalendario() {
         vacio.classList.add("dia");
         vacio.style.background = "#f4f4f4";
         calendario.appendChild(vacio);
-
-
-    
-  // function renderizarCalendario() {
-     // calendario.innerHTML = "";
-     // const hoy = new Date();
-      //const anio = hoy.getFullYear();
-     // const mes = hoy.getMonth();
-     // const primerDia = new Date(anio, mes, 1);
-     // const ultimoDia = new Date(anio, mes + 1, 0);
-     // const offset = (primerDia.getDay() + 6) % 7; // Lunes como 1er día
-
-     // for (let i = 0; i < offset; i++) {
-      //  const vacio = document.createElement("div");
-       // vacio.classList.add("dia");
-       // vacio.style.background = "#f4f4f4";
-       // calendario.appendChild(vacio);
       }
+
       for (let dia = 1; dia <= ultimoDia.getDate(); dia++) {
         const fecha = new Date(anio, mes, dia);
         const fechaLocal = new Date(fecha.getTime() - fecha.getTimezoneOffset() * 60000)
@@ -264,25 +250,39 @@ function renderizarCalendario() {
         div.innerHTML = `<strong>${dia}</strong><br>${renderizarTurno(fechaLocal)}`;
         div.onclick = () => abrirModal(fechaLocal);
         calendario.appendChild(div);
-
-
-     
-      //for (let dia = 1; dia <= ultimoDia.getDate(); dia++) {
-        //const fecha = new Date(anio, mes, dia).toISOString().split("T")[0];
-        //const div = document.createElement("div");
-        //div.classList.add("dia");
-        //div.dataset.fecha = fecha;
-        //div.innerHTML = `<strong>${dia}</strong><br>${renderizarTurno(fecha)}`;
-        //div.onclick = () => abrirModal(fecha);
-       // calendario.appendChild(div);
       }
     }
 
     function renderizarTurno(fecha) {
       const turno = turnos[fecha];
-      return turno ? `${turno.hora || ""} - ${turno.tipo || ""}` : "";
+      return turno ? `${turno.tipo || ""}` : "";
     }
 
+    function abrirModal(fecha) {
+      editFecha.value = fecha;
+      const turno = turnos[fecha] || {};
+      editHora.value = turno.hora || "";
+      editTipo.value = turno.tipo || "M";
+      editNota.value = turno.nota || "";
+      modal.classList.remove("hidden");
+    }
+
+    cerrarModal.onclick = () => modal.classList.add("hidden");
+
+    formEditar.onsubmit = function (e) {
+      e.preventDefault();
+      const fecha = editFecha.value;
+      turnos[fecha] = {
+        hora: editHora.value,
+        tipo: editTipo.value,
+        nota: editNota.value,
+      };
+      localStorage.setItem("turnos", JSON.stringify(turnos));
+      modal.classList.add("hidden");
+      renderizarCalendario();
+    };
+
+    renderizarCalendario();
     function abrirModal(fecha) {
       editFecha.value = fecha;
       const turno = turnos[fecha] || {};
