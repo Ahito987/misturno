@@ -218,20 +218,40 @@
 
     let fechaActual = new Date();
 
-   function renderizarCalendario() {
+
+function renderizarCalendario() {
       calendario.innerHTML = "";
-      const hoy = new Date();
-      const anio = hoy.getFullYear();
-      const mes = hoy.getMonth();
+      const anio = fechaActual.getFullYear();
+      const mes = fechaActual.getMonth();
       const primerDia = new Date(anio, mes, 1);
       const ultimoDia = new Date(anio, mes + 1, 0);
-      const offset = (primerDia.getDay() + 6) % 7; // Lunes como 1er día
+      const offset = (primerDia.getDay() + 6) % 7; // lunes=0
+
+      const nombreMeses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+      tituloMes.textContent = `${nombreMeses[mes]} ${anio}`;
 
       for (let i = 0; i < offset; i++) {
         const vacio = document.createElement("div");
         vacio.classList.add("dia");
         vacio.style.background = "#f4f4f4";
         calendario.appendChild(vacio);
+
+
+    
+  // function renderizarCalendario() {
+     // calendario.innerHTML = "";
+     // const hoy = new Date();
+      //const anio = hoy.getFullYear();
+     // const mes = hoy.getMonth();
+     // const primerDia = new Date(anio, mes, 1);
+     // const ultimoDia = new Date(anio, mes + 1, 0);
+     // const offset = (primerDia.getDay() + 6) % 7; // Lunes como 1er día
+
+     // for (let i = 0; i < offset; i++) {
+      //  const vacio = document.createElement("div");
+       // vacio.classList.add("dia");
+       // vacio.style.background = "#f4f4f4";
+       // calendario.appendChild(vacio);
       }
       for (let dia = 1; dia <= ultimoDia.getDate(); dia++) {
         const fecha = new Date(anio, mes, dia);
